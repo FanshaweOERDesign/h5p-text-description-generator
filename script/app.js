@@ -140,5 +140,40 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   this.getElementById("close_accepted_types").addEventListener("click", () =>
     document.getElementById("accepted_types_container").classList.toggle("hidden")
-  );  
+  );
+  this.getElementById("combine_chk").addEventListener("change", (e) => {
+    const htmlOutput = document.getElementById("html_output");
+    const answerOutput = document.getElementById("answer_output");
+    const htmlPreview = document.getElementById("preview_container");
+    const solutionPreview = document.getElementById("answer_preview");
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlOutput.value, "text/html");
+    const copySolutionBtn = document.getElementById("copy_answer");
+    const solutionLabel = document.querySelector("label[for='answer_preview']");
+
+    if (e.target.checked) {
+      const outputDetails = doc.querySelector("details");
+      let detailsHTML = outputDetails.innerHTML;
+      detailsHTML += `<div><strong>Solution:</strong> ${answerOutput.value}</div>`;
+      outputDetails.innerHTML = detailsHTML;
+      htmlOutput.value = doc.body.innerHTML;
+      htmlPreview.innerHTML = htmlOutput.value;
+      answerOutput.style.display = "none";
+      solutionPreview.style.display = "none";
+      copySolutionBtn.style.display = "none";
+      solutionLabel.style.display = "none";
+    } else {
+      answerOutput.style.display = "block";
+      const outputHtmlText = htmlOutput.value;
+      const regexString = `<div><strong>Solution:</strong> ${answerOutput.value}</div>`;
+      // Remove the solution line from the HTML output
+      htmlOutput.value = outputHtmlText.replace(
+        regexString, ""
+      );
+      htmlPreview.innerHTML = htmlOutput.value;
+      solutionPreview.style.display = "block";
+      copySolutionBtn.style.display = "inline-block";
+      solutionLabel.style.display = "block";
+    }
+  });
 });
