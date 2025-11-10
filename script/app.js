@@ -6,6 +6,7 @@ import Flashcards from "./content_types/flashCards.js";
 import Dialogcards from "./content_types/dialogCards.js";
 import TrueFalse from "./content_types/trueFalse.js";
 import Column from "./content_types/column.js";
+import Accordion from "./content_types/accordion.js";
 import QuestionSet from "./content_types/questionSet.js";
 import DocumentationTool from "./content_types/documentationTool/documentationTool.js";
 import H5P2Text from "./h5p2Text.js";
@@ -92,6 +93,7 @@ const unzipAndReadH5PFile = async (file) => {
     converter.addContentType(new Dialogcards());
     converter.addContentType(new TrueFalse());
     converter.addContentType(new DocumentationTool());
+    converter.addContentType(new Accordion());
     converter.addContentType(new Column(converter));
     converter.addContentType(new QuestionSet(converter));
   } catch (err) {

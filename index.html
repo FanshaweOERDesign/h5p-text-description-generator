@@ -47,7 +47,8 @@ SOFTWARE.
       <div id="preview_container" class="preview"></div>
       <textarea id="html_output" placeholder="Question HTML" disabled></textarea>
       <button id="copy_text" class="copy_btn">Copy Description</button>
-      <div style="box-shadow: none;"><input type="checkbox" id="combine_chk" /><label for="combine_chk">Include solutions in description</label></div>
+      <div style="box-shadow: none;"><input type="checkbox" id="combine_chk" /><label for="combine_chk">Include
+          solutions in description</label></div>
       <label for="answer_preview" class="preview_label">Solution Preview</label>
       <div id="answer_preview" class="preview"></div>
       <textarea id="answer_output" placeholder="Answer HTML" disabled></textarea>
@@ -56,21 +57,22 @@ SOFTWARE.
   </div>
   <div id="accepted_types_container" class="accepted_types_container hidden">
     <div>
-    <h2>Accepted H5P Content Types</h2>
-    <ul>
-      <li>Fill in the Blanks</li>
-      <li>Dialog Cards</li>
-      <li>Flash Cards</li>
-      <li>Multiple Choice</li>
-      <li>Single Choice Set</li>
-      <li>True or False</li>
-      <li>Documentation Tool</li>
-      <li>Drag the Words</li>
-      <li>Column containing these types</li>
-      <li>Question Set containing these types</li>
-    </ul>
-    <button id="close_accepted_types" class="close_btn">Close</button>
-  </div>
+      <h2>Accepted H5P Content Types</h2>
+      <ul>
+        <li>Accordion</li>
+        <li>Column containing these types</li>
+        <li>Dialog Cards</li>
+        <li>Documentation Tool</li>
+        <li>Drag the Words</li>
+        <li>Fill in the Blanks</li>
+        <li>Flash Cards</li>
+        <li>Multiple Choice</li>
+        <li>Question Set containing these types</li>
+        <li>Single Choice Set</li>
+        <li>True or False</li>
+      </ul>
+      <button id="close_accepted_types" class="close_btn">Close</button>
+    </div>
   </div>
   <div id="errorContainer" class="error_container"></div>
   <footer>
@@ -83,19 +85,19 @@ SOFTWARE.
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
   <script type="module" src="/script/app.js"></script>
   <script>
-        // track visits
-        (async function () {
-            try{
-                const params = new URLSearchParams({
-                  appId: window.location.pathname.split('/').filter(Boolean)[0] || 'unknown',
-                  t: Date.now()
-                });
-                await fetch(`https://apphub-analytics-server-production.up.railway.app/track.gif?${params.toString()}`); 
-            } catch(err) {
-                console.error(err);
-            }
-        })();
-    </script>
+    // track visits
+    (async function () {
+      try {
+        const params = new URLSearchParams({
+          appId: window.location.pathname.split('/').filter(Boolean)[0] || 'unknown',
+          t: Date.now()
+        });
+        await fetch(`https://apphub-analytics-server-production.up.railway.app/track.gif?${params.toString()}`);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  </script>
 </body>
 
 </html>
