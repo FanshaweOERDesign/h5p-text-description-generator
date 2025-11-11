@@ -7,6 +7,7 @@ import Dialogcards from "./content_types/dialogCards.js";
 import TrueFalse from "./content_types/trueFalse.js";
 import Column from "./content_types/column.js";
 import Accordion from "./content_types/accordion.js";
+import Timeline from "./content_types/timeline.js";
 import QuestionSet from "./content_types/questionSet.js";
 import DocumentationTool from "./content_types/documentationTool/documentationTool.js";
 import H5P2Text from "./h5p2Text.js";
@@ -94,6 +95,7 @@ const unzipAndReadH5PFile = async (file) => {
     converter.addContentType(new TrueFalse());
     converter.addContentType(new DocumentationTool());
     converter.addContentType(new Accordion());
+    converter.addContentType(new Timeline());
     converter.addContentType(new Column(converter));
     converter.addContentType(new QuestionSet(converter));
   } catch (err) {
@@ -103,12 +105,23 @@ const unzipAndReadH5PFile = async (file) => {
 
   try {
     const { accordionHtml, solution } = await converter.parse(loaded_files);
-    document.getElementById("preview_container").innerHTML = accordionHtml;
-    document.getElementById("html_output").value = accordionHtml;
-    document.getElementById("answer_preview").innerHTML = solution;
-    document.getElementById("answer_output").value = solution;
-    //console.log(accordionHtml);
-    //console.log(solution);
+
+    const parser = new DOMParser();
+const doc = parser.parseFromString(accordionHtml, "text/html");
+const details = doc.querySelector("details");
+const preview = document.getElementById("preview_container");
+preview.innerHTML = "";
+preview.appendChild(details);
+
+    document.getElementById("html_output").value = `${accordionHtml}`;
+    const answerPreview = document.getElementById("answer_preview");
+    const ansDoc = parser.parseFromString(solution, "text/html");
+    answerPreview.innerHTML = "";
+    const previewBody = ansDoc.body;
+    previewBody.style.backgroundColor = "white";
+    answerPreview.appendChild(ansDoc.body);
+    document.getElementById("answer_output").value = `${solution}`;
+  
   } catch (err) {
     document.getElementById("errorContainer").innerHTML = err;
     console.log(err);

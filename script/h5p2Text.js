@@ -23,7 +23,9 @@ class H5P2Text {
     if (!typeInstance) {
       throw new Error(`No content type found for library ${library}`);
     }
-    return typeInstance.parse(contentJsonStr);
+    const result = typeInstance.parse(contentJsonStr);
+    console.log("Parse result:", result);
+    return result;
   }
 
   getTypeInstance(library) {

@@ -6,30 +6,6 @@ export default class Accordion extends ContentType {
     this.name = "Accordion";
   }
 
-  trimEmptyHtmlEdges(html) {
-  // Create a DOM parser
-  const container = document.createElement('div');
-  container.innerHTML = html;
-
-  // Helper: check if an element is empty (only whitespace or &nbsp;)
-  const isEmptyElement = (el) => {
-    const text = el.textContent.replace(/\u00a0/g, '').trim(); // remove &nbsp; and whitespace
-    return text.length === 0;
-  };
-
-  // Remove empty elements from the start
-  while (container.firstElementChild && isEmptyElement(container.firstElementChild)) {
-    container.removeChild(container.firstElementChild);
-  }
-
-  // Remove empty elements from the end
-  while (container.lastElementChild && isEmptyElement(container.lastElementChild)) {
-    container.removeChild(container.lastElementChild);
-  }
-
-  return container.innerHTML.trim();
-}
-
   parse(contentJson) {
     const content = JSON.parse(contentJson);
 
