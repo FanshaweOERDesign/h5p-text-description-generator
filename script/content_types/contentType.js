@@ -9,17 +9,46 @@ export default class ContentType {
     return result;
   }
 
-  stripEnclosingTags(html) {
-    if (!html) {
-      return "";
+  stripEnclosingTags(htmlString) {
+    if (!htmlString) return '';
+
+    // Trim outer whitespace characters including &nbsp;
+    htmlString = htmlString.replace(/^(?:\s|&nbsp;)+|(?:\s|&nbsp;)+$/gi, '');
+
+    const container = document.createElement('div');
+    container.innerHTML = htmlString;
+
+    // Remove leading and trailing whitespace-only nodes
+    const removeEmptyNodes = (el) => {
+      while (el.firstChild && isEmptyNode(el.firstChild)) {
+        el.removeChild(el.firstChild);
+      }
+      while (el.lastChild && isEmptyNode(el.lastChild)) {
+        el.removeChild(el.lastChild);
+      }
+    };
+
+    const isEmptyNode = (node) => {
+      return (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) ||
+        (node.nodeType === Node.ELEMENT_NODE &&
+          ['BR'].includes(node.tagName) ? false : !node.textContent.trim());
+    };
+
+    removeEmptyNodes(container);
+
+    // If container now has a single child that is a div or p, unwrap it
+    while (
+      container.childNodes.length === 1 &&
+      container.firstChild.nodeType === Node.ELEMENT_NODE &&
+      ['DIV', 'P'].includes(container.firstChild.tagName)
+    ) {
+      removeEmptyNodes(container.firstChild); // clean inner whitespace
+      container.innerHTML = container.firstChild.innerHTML;
     }
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    if (div.firstChild.nodeName === "P" || div.firstChild.nodeName === "DIV") {
-      return div.firstChild.innerHTML;
-    }
-    return div.innerHTML;
+
+    return container.innerHTML.trim();
   }
+
 
   createDetailsElement(description) {
     const details = document.createElement("details");
@@ -62,26 +91,26 @@ export default class ContentType {
   }
 
   trimEmptyHtmlEdges(html) {
-  // Create a DOM parser
-  const container = document.createElement('div');
-  container.innerHTML = html;
+    // Create a DOM parser
+    const container = document.createElement('div');
+    container.innerHTML = html;
 
-  // Helper: check if an element is empty (only whitespace or &nbsp;)
-  const isEmptyElement = (el) => {
-    const text = el.textContent.replace(/\u00a0/g, '').trim(); // remove &nbsp; and whitespace
-    return text.length === 0;
-  };
+    // Helper: check if an element is empty (only whitespace or &nbsp;)
+    const isEmptyElement = (el) => {
+      const text = el.textContent.replace(/\u00a0/g, '').trim(); // remove &nbsp; and whitespace
+      return text.length === 0;
+    };
 
-  // Remove empty elements from the start
-  while (container.firstElementChild && isEmptyElement(container.firstElementChild)) {
-    container.removeChild(container.firstElementChild);
+    // Remove empty elements from the start
+    while (container.firstElementChild && isEmptyElement(container.firstElementChild)) {
+      container.removeChild(container.firstElementChild);
+    }
+
+    // Remove empty elements from the end
+    while (container.lastElementChild && isEmptyElement(container.lastElementChild)) {
+      container.removeChild(container.lastElementChild);
+    }
+
+    return container.innerHTML.trim();
   }
-
-  // Remove empty elements from the end
-  while (container.lastElementChild && isEmptyElement(container.lastElementChild)) {
-    container.removeChild(container.lastElementChild);
-  }
-
-  return container.innerHTML.trim();
-}
 }
