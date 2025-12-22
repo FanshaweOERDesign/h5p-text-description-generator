@@ -128,13 +128,21 @@ preview.appendChild(details);
   }
 };
 
-const copyContents = (target) => {
-  let copyText = document.getElementById(target);
-  copyText.select();
-  copyText.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(copyText.value);
-  window.parent.postMessage({ content: copyText.value }, "*");
-  alert("Copied to clipboard");
+const copyContents = (targetId) => {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  const text = el.value ?? el.textContent;
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      alert("Copied to clipboard");
+      window.parent.postMessage({ content: text }, "*");
+    })
+    .catch(err => {
+      console.error("Clipboard failed:", err);
+      alert("Clipboard copy failed");
+    });
 };
 
 // page initialization
