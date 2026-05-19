@@ -150,17 +150,47 @@ const legacyCopyText = (text) => {
   return copySuccess;
 };
 
+const canUseClipboardAPI = async () => {
+  if (!navigator.clipboard || !navigator.clipboard.writeText) {
+    return false;
+  }
+
+  if (!window.isSecureContext) {
+    return false;
+  }
+
+  if (navigator.permissions && navigator.permissions.query) {
+    try {
+      const status = await navigator.permissions.query({ name: "clipboard-write" });
+      return status.state !== "denied";
+    } catch (err) {
+      // Some browsers do not support querying clipboard-write; fall back to feature test.
+      return true;
+    }
+  }
+
+  return true;
+};
+
 const copyContents = async (targetId) => {
   const el = document.getElementById(targetId);
   if (!el) return;
 
   const text = el.value ?? el.textContent;
+  if (!text) {
+    alert("Nothing to copy.");
+    return;
+  }
+
   const copyMessage = () => {
     alert("Copied to clipboard");
-    window.parent.postMessage({ content: text }, "*");
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ content: text }, "*");
+    }
   };
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
+  const useClipboardApi = await canUseClipboardAPI();
+  if (useClipboardApi) {
     try {
       await navigator.clipboard.writeText(text);
       copyMessage();
