@@ -128,21 +128,55 @@ preview.appendChild(details);
   }
 };
 
-const copyContents = (targetId) => {
+const legacyCopyText = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+
+  let copySuccess = false;
+  try {
+    copySuccess = document.execCommand("copy");
+  } catch (err) {
+    console.error("Legacy copy failed:", err);
+    copySuccess = false;
+  }
+
+  document.body.removeChild(textarea);
+  return copySuccess;
+};
+
+const copyContents = async (targetId) => {
   const el = document.getElementById(targetId);
   if (!el) return;
 
   const text = el.value ?? el.textContent;
+  const copyMessage = () => {
+    alert("Copied to clipboard");
+    window.parent.postMessage({ content: text }, "*");
+  };
 
-  navigator.clipboard.writeText(text)
-    .then(() => {
-      alert("Copied to clipboard");
-      window.parent.postMessage({ content: text }, "*");
-    })
-    .catch(err => {
-      console.error("Clipboard failed:", err);
-      alert("Clipboard copy failed");
-    });
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      copyMessage();
+      return;
+    } catch (err) {
+      console.warn("Clipboard API blocked or unavailable:", err);
+    }
+  }
+
+  if (legacyCopyText(text)) {
+    copyMessage();
+    return;
+  }
+
+  console.error("Clipboard copy failed for text:", text);
+  alert("Clipboard copy failed. Please copy the text manually.");
 };
 
 // page initialization
