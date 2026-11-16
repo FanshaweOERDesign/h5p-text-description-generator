@@ -1,5 +1,5 @@
 describe('File Upload Verification', () => {
-  const testCases = Cypress.env('testCases') || [];
+  const testCases = Cypress.expose('testCases') || [];
 
   it('loads at least one test case from the external assets directory', () => {
     expect(testCases.length).to.be.greaterThan(0);

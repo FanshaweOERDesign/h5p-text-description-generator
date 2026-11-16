@@ -36,7 +36,7 @@ module.exports = defineConfig({
           };
         });
 
-      config.env.testCases = testCases;
+      config.expose = { ...config.expose, testCases };
       return config;
     },
   },
