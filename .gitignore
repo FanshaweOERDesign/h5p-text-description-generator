@@ -42,6 +42,7 @@ build/Release
 node_modules/
 cypress/screenshots/
 cypress/videos/
+cypress/results/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
