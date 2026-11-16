@@ -9,6 +9,10 @@ export default class ContentType {
     return result;
   }
 
+  parse(contentJson) {
+    throw new Error("parse() method must be implemented in subclasses");
+  }
+
   stripEnclosingTags(htmlString) {
     if (!htmlString) return '';
 

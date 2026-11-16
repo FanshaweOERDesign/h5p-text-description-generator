@@ -107,11 +107,11 @@ const unzipAndReadH5PFile = async (file) => {
     const { accordionHtml, solution } = await converter.parse(loaded_files);
 
     const parser = new DOMParser();
-const doc = parser.parseFromString(accordionHtml, "text/html");
-const details = doc.querySelector("details");
-const preview = document.getElementById("preview_container");
-preview.innerHTML = "";
-preview.appendChild(details);
+    const doc = parser.parseFromString(accordionHtml, "text/html");
+    const details = doc.querySelector("details");
+    const preview = document.getElementById("preview_container");
+    preview.innerHTML = "";
+    preview.appendChild(details);
 
     document.getElementById("html_output").value = `${accordionHtml}`;
     const answerPreview = document.getElementById("answer_preview");
@@ -121,7 +121,7 @@ preview.appendChild(details);
     previewBody.style.backgroundColor = "white";
     answerPreview.appendChild(ansDoc.body);
     document.getElementById("answer_output").value = `${solution}`;
-  
+
   } catch (err) {
     document.getElementById("errorContainer").innerHTML = err;
     console.log(err);

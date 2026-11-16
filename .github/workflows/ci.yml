@@ -1,0 +1,36 @@
+name: Cypress Upload Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  workflow_dispatch:
+
+jobs:
+  cypress-tests:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out your main application repo
+      - name: Checkout application
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      # 2. Check out your public test assets repo into a sibling folder
+      - name: Checkout test assets
+        uses: actions/checkout@v4
+        with:
+          repository: FanshaweOERDesign/h5p-text-description-tests
+          path: test-assets
+
+      # 3. Install dependencies, start your static server, and run Cypress
+      - name: Run Cypress upload tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: app
+          start: npm run start:test
+          wait-on: 'http://localhost:3000'
+        env:
+          CYPRESS_ASSETS_DIR: ${{ github.workspace }}/test-assets/cases
