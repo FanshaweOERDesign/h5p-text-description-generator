@@ -2,8 +2,8 @@
   "name": "h5p-text-description-generator",
   "version": "1.0.0",
   "description": "Generates accessible text description for selected H5P content types",
-  "main": "index.js",
   "scripts": {
+    "start": "serve .",
     "start:test": "serve . -l 3000",
     "test": "cypress run",
     "test:open": "cypress open"
@@ -20,8 +20,10 @@
     "url": "https://github.com/FanshaweOERDesign/h5p-text-description-generator/issues"
   },
   "homepage": "https://github.com/FanshaweOERDesign/h5p-text-description-generator#readme",
-  "devDependencies": {
-    "cypress": "^16.3.0",
+  "dependencies": {
     "serve": "^14.2.8"
+  },
+  "devDependencies": {
+    "cypress": "^16.3.0"
   }
 }
