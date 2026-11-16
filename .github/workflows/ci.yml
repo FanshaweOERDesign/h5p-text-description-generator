@@ -27,7 +27,7 @@ jobs:
 
       # 3. Install dependencies, start your static server, and run Cypress
       - name: Run Cypress upload tests
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7.4.4
         with:
           working-directory: app
           start: npm run start:test
