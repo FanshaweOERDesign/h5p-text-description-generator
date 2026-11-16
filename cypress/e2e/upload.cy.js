@@ -1,6 +1,54 @@
+function readCorrectChoices(solutionText, choices) {
+  expect(solutionText).to.match(/^Correct answer\(s\):/);
+  let remaining = solutionText.replace(/^Correct answer\(s\):\s*/, '');
+  const correct = [];
+  while (remaining) {
+    const label = remaining.match(/^([a-z])\. /);
+    expect(label, 'solution has an answer letter').not.to.equal(null);
+    const index = label[1].charCodeAt(0) - 97;
+    expect(index, 'solution letter refers to an existing choice').to.be.lessThan(choices.length);
+    expect(correct, 'solution does not repeat a choice').not.to.include(index);
+    remaining = remaining.slice(label[0].length);
+    const text = choices[index];
+    expect(remaining.startsWith(text), 'solution text matches its lettered choice').to.equal(true);
+    remaining = remaining.slice(text.length);
+    correct.push(index);
+    if (remaining) {
+      expect(remaining, 'correct answers are separated by semicolons').to.match(/^;\s*/);
+      remaining = remaining.replace(/^;\s*/, '');
+    }
+  }
+  return correct;
+}
+
 function normalizeOutput(output) {
   const parser = new DOMParser();
   const description = parser.parseFromString(output.accordionHtml, 'text/html');
+  const choiceList = description.querySelector('body > details > ol[type="a"]');
+  if (choiceList) {
+    const solution = parser.parseFromString(output.solution, 'text/html');
+    const solutionElement = solution.querySelector('body > div');
+    expect(solutionElement, 'multiple choice solution exists').not.to.equal(null);
+    const choices = Array.from(choiceList.children);
+    // The app renders choice text as HTML in the solution, so decode it the same way.
+    const solutionTexts = choices.map((choice) =>
+      parser.parseFromString(choice.textContent, 'text/html').body.textContent.trim()
+    );
+    const correct = readCorrectChoices(solutionElement.textContent.trim(), solutionTexts);
+    const normalizedChoices = choices.map((choice, index) => ({
+      html: choice.outerHTML,
+      correct: correct.includes(index),
+    }));
+    normalizedChoices.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+    choiceList.replaceChildren();
+    solutionElement.textContent = 'Correct answer(s):';
+    return {
+      accordionHtml: description.body.innerHTML,
+      solution: solution.body.innerHTML,
+      choices: normalizedChoices,
+    };
+  }
+
   const answerLists = Array.from(description.querySelectorAll('details > div'))
     .filter((element) => element.textContent.trim() === 'Possible answers:')
     .map((element) => element.nextElementSibling)
