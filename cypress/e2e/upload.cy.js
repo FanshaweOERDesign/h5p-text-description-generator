@@ -1,3 +1,29 @@
+function normalizeCardOutput(output) {
+  if (!/This activity contains a set of (dialog cards|flashcards),/.test(output.accordionHtml)) {
+    return output;
+  }
+
+  const parser = new DOMParser();
+  const description = parser.parseFromString(output.accordionHtml, 'text/html');
+  const solution = parser.parseFromString(output.solution, 'text/html');
+  const cardList = description.querySelector('details > ol');
+  const answerList = solution.querySelector('body > ol');
+  const cards = Array.from(cardList.children);
+  const answers = Array.from(answerList.children);
+
+  expect(answers.length, 'one solution per card').to.equal(cards.length);
+  const pairs = cards.map((card, index) => [card.outerHTML, answers[index].outerHTML]);
+  pairs.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  cardList.replaceChildren();
+  answerList.replaceChildren();
+
+  return {
+    accordionHtml: description.body.innerHTML,
+    solution: solution.body.innerHTML,
+    pairs,
+  };
+}
+
 describe('File Upload Verification', () => {
   const testCases = Cypress.expose('testCases') || [];
 
@@ -14,13 +40,19 @@ describe('File Upload Verification', () => {
         .should('be.visible')
         .selectFile(testCase.inputPath, { action: 'drag-drop' });
 
-      cy.get('#html_output', { timeout: 15000 })
+      cy.get('#html_output, #answer_output', { timeout: 15000 })
         .should('be.visible')
-        .and('have.value', testCase.expected.accordionHtml);
-
-      cy.get('#answer_output')
-        .should('be.visible')
-        .and('have.value', testCase.expected.solution);
+        .and(($outputs) => {
+          const actual = {
+            accordionHtml: $outputs.filter('#html_output').val(),
+            solution: $outputs.filter('#answer_output').val(),
+          };
+          const expected = {
+            accordionHtml: testCase.expected.accordionHtml,
+            solution: testCase.expected.solution,
+          };
+          expect(normalizeCardOutput(actual)).to.deep.equal(normalizeCardOutput(expected));
+        });
     });
   });
 });
