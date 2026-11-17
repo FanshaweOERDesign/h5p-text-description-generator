@@ -24,6 +24,42 @@ function readCorrectChoices(solutionText, choices) {
 function normalizeOutput(output) {
   const parser = new DOMParser();
   const description = parser.parseFromString(output.accordionHtml, 'text/html');
+  const questionList = description.querySelector('body > details > ol:not([type])');
+  const questionChoices = questionList && Array.from(questionList.children, (question) =>
+    question.querySelector(':scope > ol[type="a"]')
+  );
+  if (questionChoices?.some(Boolean)) {
+    expect(questionChoices.every(Boolean), 'every question has a choice list').to.equal(true);
+    const solution = parser.parseFromString(output.solution, 'text/html');
+    const answerList = solution.querySelector('body > ol');
+    expect(answerList, 'single choice set solution exists').not.to.equal(null);
+    const answers = Array.from(answerList.children);
+    expect(answers.length, 'one solution per question').to.equal(questionChoices.length);
+    const normalizedQuestions = questionChoices.map((list, questionIndex) => {
+      const choices = Array.from(list.children);
+      const answer = answers[questionIndex].textContent.trim();
+      const label = answer.match(/^([a-z])\. /);
+      expect(label, 'solution has an answer letter').not.to.equal(null);
+      const correctIndex = label[1].charCodeAt(0) - 97;
+      expect(correctIndex, 'solution letter refers to an existing choice').to.be.lessThan(choices.length);
+      expect(answer.slice(label[0].length), 'solution text matches its lettered choice')
+        .to.equal(choices[correctIndex].textContent.trim());
+      const normalizedChoices = choices.map((choice, index) => ({
+        html: choice.outerHTML,
+        correct: index === correctIndex,
+      }));
+      normalizedChoices.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+      list.replaceChildren();
+      answers[questionIndex].textContent = '';
+      return normalizedChoices;
+    });
+    return {
+      accordionHtml: description.body.innerHTML,
+      solution: solution.body.innerHTML,
+      questions: normalizedQuestions,
+    };
+  }
+
   const choiceList = description.querySelector('body > details > ol[type="a"]');
   if (choiceList) {
     const solution = parser.parseFromString(output.solution, 'text/html');
